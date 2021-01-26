@@ -9,7 +9,8 @@ One of the main reasons behind the birth of this project is the need for well do
 To realize this goal, a test driven approach is employed to design and add new features to the library. Indeed before implementing any functionality, a test should be designed for it, and each valid feature should pass all the tests related to it. The definition of tests in the field of audio applications could be unclear (for example, defining a test to determine the success of a source separation algorithm, could be challenging), but it’s essential to design reliable tests to verify the correctness of the new piece of code.
 
 If you want to offer your help for this project, and you share the same need for a high quality dsp audio oriented python library, your contribution is more than welcome. There are various way in which you could contribute for the project, shaping the future and destiny of this open source project:
-Proposing new features:
+
+- **Proposing new features**:
 If you’ve got an idea for a new feature you would like to be added in the library, you could help us even just by proposing it. Indeed we think that understanding the future needs of the user is of fundamental importance.
 
 - **Researching implementations on papers**:
