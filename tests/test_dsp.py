@@ -2,8 +2,23 @@ from pathlib import Path
 import numpy as np
 import unittest
 from dsp import util
-from dsp.processing import denoise, normalize, normalize_std
+from dsp.processing import denoise, normalize, normalize_std, whiten
 from scipy.io import wavfile
+from librosa import feature
+
+
+class TestDb(unittest.TestCase):
+    def setUp(self):
+        self.eps = 1e-10
+
+    def test_one(self):
+        self.assertLess(util.db(1), self.eps)
+
+    def test_zero(self):
+        self.assertEqual(util.db(0), float('-inf'))
+
+    def test_manual(self):
+        self.assertLess(np.abs(util.db(10) - 20), self.eps)
 
 
 class TestStridedWindowing(unittest.TestCase):
@@ -124,6 +139,21 @@ class TestNormalizeStd(unittest.TestCase):
         null_signal = np.zeros(10)
         with self.assertRaises(AssertionError):
             normalize_std(null_signal, self.x)
+
+
+class TestWhiten(unittest.TestCase):
+    def setUp(self):
+        self.fs, self.audio = wavfile.read(Path('.').joinpath('mocks', 'disco0.wav'))
+        self.noise = np.random.normal(size=10000)
+        self.noise_spectral_flatness = np.mean(feature.spectral_flatness(self.noise))
+        self.noise_threshold = util.db(self.noise_spectral_flatness * 0.8)
+        self.audio = np.sum(self.audio, axis=1)
+        self.audio = self.audio / np.max(self.audio)
+
+    def test_on_track(self):
+        whitened = whiten(self.audio)
+        spectral_flatness = np.mean(feature.spectral_flatness(whitened))
+        self.assertGreater(util.db(spectral_flatness), self.noise_threshold)
 
 
 if __name__ == '__main__':

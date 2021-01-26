@@ -13,3 +13,7 @@ def strided_windowing(x, win_len, hopsize):
     X = as_strided(y, (win_len, ((len(y) - win_len) // hopsize) + 1),
                    (blocksize, hopsize * blocksize))
     return X
+
+
+def db(x):
+    return 20 * np.log10(x) if x != 0 else float('-inf')
