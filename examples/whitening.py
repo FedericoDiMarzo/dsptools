@@ -5,6 +5,11 @@ from scipy import signal
 from scipy.io import wavfile
 from dsp.processing import whiten
 
+"""
+In this example the periodogram of a signal is plotted before
+and after the whitening process, showing how the spectrum flattens.
+"""
+
 ylim = [-150, 80]
 
 # %% importing audio file

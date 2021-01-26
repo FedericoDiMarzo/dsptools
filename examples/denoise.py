@@ -6,6 +6,12 @@ from scipy.io import wavfile
 import sounddevice as sd
 from dsp.processing import denoise
 
+"""
+In this example  a vocal audio file is loaded and summed
+with white noise. The original signal is recovered 
+with the help of a Weiner filter used as denoiser,
+"""
+
 ylim = [-150, 80]
 
 # %% importing audio file

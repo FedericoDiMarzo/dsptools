@@ -5,6 +5,11 @@ from scipy.io import wavfile
 import sounddevice as sd
 from dsp.processing import median_separation, normalize
 
+"""
+This example shows the usage of the HPSS algorithm for
+separating percussive and harmonic parts from a source
+"""
+
 # %% importing audio file
 path = Path().joinpath('media', 'audio', 'mixdowns', 'disco0.wav')
 fs, audio = wavfile.read(path)
