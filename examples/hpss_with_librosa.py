@@ -2,8 +2,8 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
+from scipy import signal
 import sounddevice as sd
-from dsp.processing import hpss, normalize
 from librosa.decompose import hpss
 
 """
@@ -12,7 +12,7 @@ separating percussive and harmonic parts from a source
 """
 
 # %% importing audio file
-path = Path().joinpath('media', 'audio', 'mixdowns', 'disco0.wav')
+path = Path('..').joinpath('media', 'audio', 'mixdowns', 'disco0.wav')
 fs, audio = wavfile.read(path)
 audio = np.sum(audio, axis=1)  # mono sum
 audio = audio / np.max(audio)  # normalization
@@ -21,30 +21,33 @@ t_end = 10
 sample_begin = t_begin * fs
 sample_end = t_end * fs
 audio = audio[sample_begin:sample_end]  # resizing
-t = np.linspace(0, len(audio)/fs, len(audio))
+t = np.linspace(0, len(audio) / fs, len(audio))
 
-plt.subplot(311)
-plt.plot(t, audio)
-plt.title('original audio')
+# %% STFT and HPSS
+_, _, X = signal.stft(audio, return_onesided=True)
+H, P = hpss(X)
+_, p = signal.istft(P, input_onesided=True)
+_, h = signal.istft(H, input_onesided=True)
+p = p[0:len(audio)]
+h = h[0:len(audio)]
 
-#%% percussive mask extraction
-percussive, harmonic = hpss(audio, fs)
-percussive = normalize(percussive)
-harmonic = normalize(harmonic)
-
-plt.subplot(312)
-plt.plot(t, percussive)
-plt.title('percussive')
-
-plt.subplot(313)
-plt.plot(t, harmonic)
-plt.title('harmonic')
+# %% plotting
+plt.subplot(211)
+plt.plot(p)
+plt.subplot(212)
+plt.plot(h)
 plt.show()
 
-#%% play sounds
+# %% numerical tests
+print('difference between original and sum: {}'
+      .format(np.mean(audio - p - h)))
+
+# %% sound
 sd.play(audio, fs)
 sd.wait()
-sd.play(percussive, fs)
+sd.play(p, fs)
 sd.wait()
-sd.play(harmonic, fs)
+sd.play(h, fs)
 sd.wait()
+
+
