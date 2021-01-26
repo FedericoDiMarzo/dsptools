@@ -47,7 +47,7 @@ class TestDenoise(unittest.TestCase):
     def setUp(self):
         self.length = 2 ** 18
         self.noise = np.random.normal(size=self.length)
-        self.fs, self.audio = wavfile.read(Path().joinpath('tests', 'mocks', 'disco0.wav'))
+        self.fs, self.audio = wavfile.read(Path('.').joinpath('mocks', 'disco0.wav'))
         self.audio = np.sum(self.audio, axis=1)
         self.audio = self.audio[0:self.length]
         self.eps = 1e-6
@@ -68,6 +68,7 @@ class TestDenoise(unittest.TestCase):
 
     def test_high_gaussian(self):
         self.assertGaussianVar(0.8)
+
 
 if __name__ == '__main__':
     unittest.main()
