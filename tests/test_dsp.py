@@ -2,7 +2,7 @@ from pathlib import Path
 import numpy as np
 import unittest
 from dsp import util
-from dsp.processing import denoise, normalize, normalize_std, whiten
+from dsp.processing import denoise, normalize, normalize_std, whiten, hpss
 from scipy.io import wavfile
 from librosa import feature
 
@@ -65,7 +65,7 @@ class TestDenoise(unittest.TestCase):
         self.fs, self.audio = wavfile.read(Path('.').joinpath('mocks', 'disco0.wav'))
         self.audio = np.sum(self.audio, axis=1)
         self.audio = self.audio[0:self.length]
-        self.eps = 1e-6
+        self.eps = 1e-10
         self.var_noise = np.var(self.noise)
 
     def assertGaussianVar(self, intensity):
@@ -154,6 +154,18 @@ class TestWhiten(unittest.TestCase):
         whitened = whiten(self.audio)
         spectral_flatness = np.mean(feature.spectral_flatness(whitened))
         self.assertGreater(util.db(spectral_flatness), self.noise_threshold)
+
+
+class TestHPSS(unittest.TestCase):
+    def setUp(self):
+        self.fs, self.audio = wavfile.read(Path('.').joinpath('mocks', 'disco0.wav'))
+        self.audio = np.sum(self.audio, axis=1)
+        self.audio = self.audio / np.max(self.audio)
+        self.eps = 1e-10
+
+    def test_sum(self):
+        h, p = hpss(self.audio, self.fs)
+        self.assertLess(np.mean((self.audio - p - h) ** 2), self.eps)
 
 
 if __name__ == '__main__':

@@ -79,42 +79,53 @@ def whiten(x, segment_len=256, fft_resolution=1024):
     return y
 
 
-# TODO: not working properly
-# Harmonic Percussive Sound Separation with median filtering
-def hpss(audio, fs, segment_len=1024, fft_resolution=1024,
-         fp=17, fh=21):
+def hpss(audio, fs, temporal_kernel=0.25, frequency_kernel=1500):
+    """
+    Harmonic Percussive Sound Separation using a vertical and
+    horizontal median filtering in the STFT
+
+    :param audio: input signal
+    :param fs: sampling frequency
+    :param temporal_kernel: horizontal median filter order
+    :param frequency_kernel: vertical median filter order
+    :return: harmonic, percussive
+    """
+    segment_len = 512
+    fft_resolution = 1024
+    kernel_size = (
+        int(np.ceil(temporal_kernel * fs / (segment_len / 2))),  # horizontal filter order
+        int(np.ceil(frequency_kernel * fft_resolution / fs)),  # vertical filter order
+    )
     _, _, X = signal.stft(audio, fs,
                           nperseg=segment_len,
                           nfft=fft_resolution,
                           return_onesided=True)
-    Y = np.abs(X) ** 2
+    # phase = np.exp(1j*np.angle(X))
+    X_mag = np.abs(X)
 
-    # P: vertical filtering - percussive matrix
     # H: horizontal filtering - harmonic matrix
-    P = ndimage.median_filter(Y, (fp, 1))
-    H = ndimage.median_filter(Y, (1, fh))
-
-    # binary masks
-    Mp = np.int8(P >= H)
-    Mh = np.int8(P < H)
+    # P: vertical filtering - percussive matrix
+    H = ndimage.median_filter(X_mag, (1, kernel_size[0])) ** 2
+    P = ndimage.median_filter(X_mag, (kernel_size[1], 1)) ** 2
 
     # Wiener filter
-    eps = 1e-5
-    Hp = (P + eps / 2) / (P + H + eps)
-    Hh = (H + eps / 2) / (P + H + eps)
-    Xp = X ** Mp
-    Xh = X * Mh
-
-    _, percussive = signal.istft(P, fs,
-                                 nperseg=segment_len,
-                                 nfft=fft_resolution,
-                                 input_onesided=True)
+    eps = 1e-10
+    mask_h = (H + eps / 2) / (P + H + eps)
+    mask_p = (P + eps / 2) / (P + H + eps)
+    Xh = X * mask_h
+    Xp = X * mask_p
 
     _, harmonic = signal.istft(Xh, fs,
                                nperseg=segment_len,
                                nfft=fft_resolution,
                                input_onesided=True)
+
+    _, percussive = signal.istft(Xp, fs,
+                                 nperseg=segment_len,
+                                 nfft=fft_resolution,
+                                 input_onesided=True)
+
     percussive = percussive[0:len(audio)]
     harmonic = harmonic[0:len(audio)]
 
-    return percussive, harmonic
+    return harmonic, percussive

@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from scipy.io import wavfile
 import sounddevice as sd
 from dsp.processing import hpss, normalize
-from librosa.decompose import hpss
 
 """
 This example shows the usage of the HPSS algorithm for
@@ -12,25 +11,26 @@ separating percussive and harmonic parts from a source
 """
 
 # %% importing audio file
-path = Path().joinpath('media', 'audio', 'mixdowns', 'disco0.wav')
+path = Path('..').joinpath('media', 'audio', 'mixdowns', 'disco0.wav')
+path = Path('..').joinpath('media', 'audio', 'mixdowns', 'PercPlusHarm.wav')
 fs, audio = wavfile.read(path)
 audio = np.sum(audio, axis=1)  # mono sum
 audio = audio / np.max(audio)  # normalization
-t_begin = 5
+t_begin = 0
 t_end = 10
 sample_begin = t_begin * fs
 sample_end = t_end * fs
 audio = audio[sample_begin:sample_end]  # resizing
-t = np.linspace(0, len(audio)/fs, len(audio))
+t = np.linspace(0, len(audio) / fs, len(audio))
 
 plt.subplot(311)
 plt.plot(t, audio)
 plt.title('original audio')
 
-#%% percussive mask extraction
-percussive, harmonic = hpss(audio, fs)
-percussive = normalize(percussive)
-harmonic = normalize(harmonic)
+# %% percussive mask extraction
+harmonic, percussive = hpss(audio, fs)
+# percussive = normalize(percussive)
+# harmonic = normalize(harmonic)
 
 plt.subplot(312)
 plt.plot(t, percussive)
@@ -41,7 +41,7 @@ plt.plot(t, harmonic)
 plt.title('harmonic')
 plt.show()
 
-#%% play sounds
+# %% play sounds
 sd.play(audio, fs)
 sd.wait()
 sd.play(percussive, fs)
