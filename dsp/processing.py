@@ -4,7 +4,8 @@ from scipy import fft, signal, ndimage
 
 def denoise(x, noise, segment_len=256, fft_resolution=1024):
     """
-    Applies a Weiner filter to the input to reduce the noise
+    Applies a Weiner filter to the input to reduce the noise.
+
     :param x: input signal
     :param noise: sample of noise signal
     :param segment_len: analysis and synthesis window lengths
@@ -28,7 +29,7 @@ def denoise(x, noise, segment_len=256, fft_resolution=1024):
 def whiten(x, segment_len=256, fft_resolution=1024):
     """
     Whitening flattens the magnitude spectrum of a signal.
-    The processing is applied for overlapping segment.
+    The processing is applied for all the overlapping segments.
 
     :param x: input signal
     :param segment_len: analysis and synthesis window lengths
@@ -52,32 +53,35 @@ def whiten(x, segment_len=256, fft_resolution=1024):
 
 
 def normalize(x):
-    return x / np.max(x)
+    """
+    Normalizes a signal in the range -1 1.
+
+    :param x: input signal
+    :return: normalized signal
+    """
+    normalization_factor = np.max(x) - np.min(x)
+    assert normalization_factor != 0, "Normalization of all zero valued signal is not allowed"
+    return (x - np.mean(x)) / normalization_factor
 
 
-def normalize_std(x, ref=None):
+def normalize_std(x, ref):
     """
     Normalizes a signal based on the std of a reference signal.
-    The target std is considered 1 if a refence signal is not provided.
 
     :param x: input signal
     :param ref: reference signal
     :return: normalized signal
     """
-    std_ref = np.std(ref) if ref is not None else 1
+    std_ref = np.std(ref)
     std_x = np.std(x)
     assert std_x != 0, "Normalization of zero variance signal is not allowed"
     return x / std_x * std_ref
 
 
-def adaptive_filtering(x, block_size=64):
-    X = view_as_windows(x, block_size, 1)
-    h = np.random.random(block_size)
-
-
 # TODO: not working properly
-def median_separation(audio, fs, segment_len=1024, fft_resolution=1024,
-                      fp=17, fh=21):
+# Harmonic Percussive Sound Separation with median filtering
+def hpss(audio, fs, segment_len=1024, fft_resolution=1024,
+         fp=17, fh=21):
     _, _, X = signal.stft(audio, fs,
                           nperseg=segment_len,
                           nfft=fft_resolution,

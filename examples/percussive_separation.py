@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
 import sounddevice as sd
-from dsp.processing import median_separation, normalize
+from dsp.processing import hpss, normalize
 
 """
 This example shows the usage of the HPSS algorithm for
@@ -27,7 +27,7 @@ plt.plot(t, audio)
 plt.title('original audio')
 
 #%% percussive mask extraction
-percussive, harmonic = median_separation(audio, fs)
+percussive, harmonic = hpss(audio, fs)
 percussive = normalize(percussive)
 harmonic = normalize(harmonic)
 
