@@ -2,7 +2,7 @@ from pathlib import Path
 import numpy as np
 import unittest
 from dsp import util
-from dsp.processing import denoise
+from dsp.processing import denoise, normalize, normalize_std
 from scipy.io import wavfile
 
 
@@ -68,6 +68,62 @@ class TestDenoise(unittest.TestCase):
 
     def test_high_gaussian(self):
         self.assertGaussianVar(0.8)
+
+
+class TestNormalize(unittest.TestCase):
+    def setUp(self):
+        self.x = np.random.normal(size=100)
+        self.eps = 1e-10
+
+    def assertNormalization(self, signal_to_normalize):
+        normalized = normalize(signal_to_normalize)
+        self.assertLess(np.min(normalized) + 1, self.eps)
+        self.assertLess(np.max(normalized) - 1, self.eps)
+
+    def test_zero_mean(self):
+        self.assertNormalization(self.x * 10)
+
+    def test_nonzero_mean(self):
+        self.assertNormalization(self.x * 5 + 3)
+
+    def test_not_copy(self):
+        y = normalize(self.x)
+        y[0] = 20
+        self.assertNotEqual(self.x[0], y[0])
+
+    def test_null_signal(self):
+        null_signal = np.zeros(10)
+        with self.assertRaises(AssertionError):
+            normalize(null_signal)
+
+
+class TestNormalizeStd(unittest.TestCase):
+    def setUp(self):
+        self.x = np.random.normal(size=100)
+        self.eps = 1e-10
+
+    def assertNormalizationStd(self, signal_to_normalize, reference):
+        normalized = normalize_std(signal_to_normalize, reference)
+        self.assertLess(np.std(normalized) - np.std(reference), self.eps)
+
+    def test_zero_mean(self):
+        self.assertNormalizationStd(self.x, self.x * 100)
+
+    def test_nonzero_mean1(self):
+        self.assertNormalizationStd(self.x + 10, self.x * 100)
+
+    def test_nonzero_mean2(self):
+        self.assertNormalizationStd(self.x + 10, self.x * 100 - 3)
+
+    def test_not_copy(self):
+        y = normalize_std(self.x, 4)
+        y[0] = 100
+        self.assertNotEqual(y[0], self.x[0])
+
+    def test_null_signal(self):
+        null_signal = np.zeros(10)
+        with self.assertRaises(AssertionError):
+            normalize_std(null_signal, self.x)
 
 
 if __name__ == '__main__':

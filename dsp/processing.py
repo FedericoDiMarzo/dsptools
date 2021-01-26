@@ -2,6 +2,33 @@ import numpy as np
 from scipy import fft, signal, ndimage
 
 
+def normalize(x):
+    """
+    Normalizes a signal in the range -1 1.
+
+    :param x: input signal
+    :return: normalized signal
+    """
+    normalization_factor = np.max(x) - np.min(x)
+    assert normalization_factor != 0, "Normalization of all zero valued signal is not allowed"
+    # newvalue= (max'-min')/(max-min)*(oldvalue-min)+min'
+    return 2 / normalization_factor * (x - np.max(x)) + 1
+
+
+def normalize_std(x, ref):
+    """
+    Normalizes a signal based on the std of a reference signal.
+
+    :param x: input signal
+    :param ref: reference signal
+    :return: normalized signal
+    """
+    std_ref = np.std(ref)
+    std_x = np.std(x)
+    assert std_x != 0, "Normalization of zero variance signal is not allowed"
+    return x / std_x * std_ref
+
+
 def denoise(x, noise, segment_len=256, fft_resolution=1024):
     """
     Applies a Weiner filter to the input to reduce the noise.
@@ -50,32 +77,6 @@ def whiten(x, segment_len=256, fft_resolution=1024):
                         input_onesided=True)
     y = normalize_std(y, x)
     return y
-
-
-def normalize(x):
-    """
-    Normalizes a signal in the range -1 1.
-
-    :param x: input signal
-    :return: normalized signal
-    """
-    normalization_factor = np.max(x) - np.min(x)
-    assert normalization_factor != 0, "Normalization of all zero valued signal is not allowed"
-    return (x - np.mean(x)) / normalization_factor
-
-
-def normalize_std(x, ref):
-    """
-    Normalizes a signal based on the std of a reference signal.
-
-    :param x: input signal
-    :param ref: reference signal
-    :return: normalized signal
-    """
-    std_ref = np.std(ref)
-    std_x = np.std(x)
-    assert std_x != 0, "Normalization of zero variance signal is not allowed"
-    return x / std_x * std_ref
 
 
 # TODO: not working properly
