@@ -53,7 +53,7 @@ Before proposing a branch merging, you should design or use already designed tes
 - **Always propose matrix vector form solutions**:
 Python for loops are inherently slow, *VERY* slow, compared to a matrix vector implementation. As a rule of thumb, never write a loop if you think it’s strictly necessary, and even if that’s the case, try to find an alternative implementation using vectors and matrices (for example, an iterative sample by sample algorithm, could be vectorized in a block form).
 
-- **Annotate the algorithms with link and references*:
+- **Annotate the algorithms with link and references**:
 In order to understand the work of others, citing and linking the scientific papers that originated the code is essential. Try to keep track of all the references with comments.
 
 
