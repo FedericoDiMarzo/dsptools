@@ -14,7 +14,7 @@ If you want to offer your help for this project, and you share the same need for
 If you’ve got an idea for a new feature you would like to be added in the library, you could help us even just by proposing it. Indeed we think that understanding the future needs of the user is of fundamental importance.
 
 - **Researching implementations on papers**:
-The scientific literature of audio processing algorithms is vast, and choosing the best implementation could be challenging. If you feel confident in researching and giving us insights in the best solutions, your contribution could be essential.
+The scientific literature of audio processing algorithms is vast, and choosing the best implementation could be challenging. If you feel confident in researching and giving us insights on the best solutions, your contribution could be essential.
 
 - **Designing tests**:
 Before any line of code could be written for a new functionality, a test needs to be designed. We’re currently employing a unittest methodology trying to define the boundaries of each algorithm, understanding its criteria of correctness. Your help would be useful both in the theoretical (clarifying the theory needed to design a test) and practical (implementing the test with the unittest framework, based on a theoretical base) sides.
@@ -35,10 +35,10 @@ The overall architectural design of the library is of fundamental importance. If
 # Design guidelines
 If you’re willing to participate in the development of dsptools, there are few guidelines that should be followed, in order to ensure a controlled growth of the library. 
 
-If you’re not confident in contributing to open source repositories, this video should clear your doubts:
+If you’re not confident in contributing to open source repositories, this video should clear your doubts:  
 https://www.youtube.com/watch?v=HbSjyU2vf6Y&ab_channel=TheNetNinja
 
-If you want a crash course to unittest and test driven design, you find an useful introduction here:
+If you want a crash course to unittest and test driven design, you find an useful introduction here:  
 https://www.youtube.com/watch?v=6tNS--WetLI&ab_channel=CoreySchafer
 
 *(both of the authors of the videos are not related to the project)*
